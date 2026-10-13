@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>EcoVision AI – Prototype</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#f4f8f4;--card:#fff;--tx:#1b2a1f;--mu:#5d6f62;--ac:#2e8b57;--bd:#d8e4da;--wa:#fff4d6;--er:#fde4e4}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#101a14;--card:#18261d;--tx:#e6f0e8;--mu:#9bb0a0;--ac:#4cc585;--bd:#2a3d30;--wa:#3d3418;--er:#432222}}
+:root[data-theme="dark"]{--bg:#101a14;--card:#18261d;--tx:#e6f0e8;--mu:#9bb0a0;--ac:#4cc585;--bd:#2a3d30;--wa:#3d3418;--er:#432222}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+.w{max-width:680px;margin:0 auto;padding:20px 16px 40px}
+h1{margin:0;font-size:1.7rem}.sub{color:var(--mu);margin:2px 0 16px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:16px;margin-bottom:14px}
+.drop{border:2px dashed var(--bd);border-radius:12px;padding:26px;text-align:center;cursor:pointer;color:var(--mu)}
+.drop:hover{border-color:var(--ac)}
+img#pv{max-width:100%;max-height:260px;border-radius:10px;display:block;margin:0 auto}
+label{font-size:.85rem;color:var(--mu);display:block;margin:10px 0 4px}
+select,input[type=range]{width:100%}select{padding:8px;border-radius:8px;border:1px solid var(--bd);background:var(--card);color:var(--tx)}
+button{background:var(--ac);color:#fff;border:0;border-radius:10px;padding:11px 18px;font-size:1rem;cursor:pointer;margin-top:12px;width:100%}
+button:disabled{opacity:.5}
+.bar{height:12px;background:var(--bd);border-radius:8px;overflow:hidden}.bar i{display:block;height:100%;background:var(--ac);width:0;transition:width .6s}
+.msg{padding:10px 12px;border-radius:10px;margin:8px 0;font-size:.92rem}.wa{background:var(--wa)}.er{background:var(--er)}.ok{background:color-mix(in srgb,var(--ac) 18%,transparent)}
+.big{font-size:1.4rem;font-weight:700;margin:4px 0 10px}.row{display:flex;justify-content:space-between;font-size:.88rem;margin:4px 0}
+.tabs{display:flex;gap:6px;margin-bottom:14px}.tabs button{margin:0;background:var(--card);color:var(--tx);border:1px solid var(--bd);padding:9px 6px;font-size:.9rem}.tabs button.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+.two{display:flex;gap:8px}.two button{margin-top:8px}.sec{background:var(--card);color:var(--tx);border:1px solid var(--bd)}
+.pill{display:inline-block;padding:3px 10px;border-radius:99px;font-size:.8rem;color:#fff;margin-right:6px}
+.hb{display:flex;align-items:center;gap:8px;font-size:.88rem;margin:6px 0}.hb span:first-child{width:90px}.hb .bar{flex:1}.hb b{width:24px;text-align:right}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:8px}.opts button{margin:0;background:var(--card);color:var(--tx);border:1px solid var(--bd)}
+.stat{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center}.stat div{background:var(--bg);border-radius:10px;padding:10px}.stat b{font-size:1.3rem;display:block}
+.bins{display:flex;gap:10px;justify-content:center;margin:10px 0}.bin{width:70px;text-align:center;font-size:.7rem;opacity:.45;transition:.4s}.bin.on{opacity:1;transform:scale(1.1)}
+.bin .lid{height:8px;border-radius:4px 4px 0 0;transform-origin:left bottom;transition:.5s}.bin.on .lid{transform:rotate(-28deg) translateY(-3px)}.bin .bd{height:50px;border-radius:0 0 8px 8px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;color:#fff}
+canvas#ov{max-width:100%;border-radius:10px;display:block;margin:0 auto 10px}.badge{display:inline-block;padding:6px 10px;border:1px solid var(--bd);border-radius:10px;margin:4px 4px 0 0;font-size:.85rem}.badge.off{opacity:.35;filter:grayscale(1)}
+.hide{display:none}.note{font-size:.8rem;color:var(--mu)}
+</style></head><body><div class="w">
+<h1>♻️ EcoVision AI</h1><div class="sub">Smart Waste Classification and Recycling Assistant · UI prototype · v3</div>
+
+<div class="tabs"><button class="on" data-t="cl">🔍 Classify</button><button data-t="db">📊 Dashboard</button></div>
+<div id="cl"><div class="card">
+ <div class="drop" id="drop">📤 Click to upload a waste image<br><small>JPG / PNG / WebP</small></div>
+ <input type="file" id="f" accept="image/*" class="hide"><input type="file" id="cam" accept="image/*" capture="environment" class="hide">
+ <div class="two"><button class="sec" onclick="f.click()">📁 Upload</button><button class="sec" onclick="cam.click()">📷 Camera</button></div>
+ <img id="pv" class="hide" alt="preview">
+ <div id="q"></div>
+ <label>Demo model output (simulates the AI prediction)</label>
+ <select id="sim">
+  <option value="Plastic">Plastic bottle</option><option value="Paper">Paper / cardboard</option>
+  <option value="Metal">Metal can</option><option value="Glass">Glass bottle</option>
+  <option value="Organic">Organic / food waste</option><option value="E-waste">E-waste</option>
+  <option value="Unknown">Unclear image (low confidence)</option>
+ </select>
+ <label>Detection mode</label>
+ <select id="mode"><option value="1">Single item</option><option value="m">Multi-item detection (several items in one photo)</option></select>
+ <label>Region (bin guidelines)</label>
+ <select id="reg"><option value="in">India – Green / Blue / Red bins</option><option value="gen">Generic – Recycle / Compost / E-waste</option></select>
+ <label>Minimum confidence: <b id="tv">25%</b></label>
+ <input type="range" id="th" min="5" max="90" value="25">
+ <button id="go" disabled>🔍 Classify</button>
+ <div class="note">Prototype only: predictions are simulated. The real model runs in the Streamlit app (app.py). Blur/brightness checks below are computed live in your browser.</div>
+</div>
+
+<div id="res" class="card hide"></div></div>
+<div id="db" class="hide"><div class="card"><div class="stat"><div><b id="s1">0</b>Items</div><div><b id="s2">0%</b>Recyclable</div><div><b id="s3">0</b>Eco points</div></div></div>
+<div class="card"><b>Badges</b><div id="bdg"></div></div>
+<div class="card"><b>Waste by category</b><div id="bars"></div></div>
+<div class="card"><b>Recent classifications</b><div id="hist" class="note" style="margin-top:8px"></div><button class="sec" id="clr">Clear history</button></div></div>
+</div>
+<script>
+const f=document.getElementById("f"),cam=document.getElementById("cam");
+const D={
+Plastic:["🧴","♻️ Recyclable (check the number)","Rinse, remove caps/labels if required, place in the dry/recyclable bin. Soft films go to a plastic collection point."],
+Paper:["📄","♻️ Recyclable (if clean and dry)","Flatten boxes, keep dry, use the paper bin. Greasy paper goes to compost/wet waste."],
+Metal:["🥫","♻️ Highly recyclable","Rinse residue, place in the metal/dry bin. Wrap sharp items. Scrap can go to local recyclers."],
+Glass:["🍾","♻️ Recyclable (handle with care)","Rinse, use the glass bin or bottle-return. Wrap broken glass in paper and label it."],
+Organic:["🍌","🌱 Compostable","Use the wet/green bin or home compost. Keep away from plastic."],
+"E-waste":["🔋","⚠️ Hazardous – special handling","Never put in regular bins. Take to an authorised e-waste centre. Remove batteries if possible."]};
+const $=id=>document.getElementById(id);let ok=false;
+$("drop").onclick=()=>f.click();
+$("th").oninput=e=>$("tv").textContent=e.target.value+"%";
+$("f").onchange=$("cam").onchange=e=>{const file=e.target.files[0];if(!file)return;
+ const img=new Image();img.onload=()=>{cur=img;$("pv").src=img.src;$("pv").classList.remove("hide");$("drop").classList.add("hide");check(img);ok=true;$("go").disabled=false};
+ img.onerror=()=>{$("q").innerHTML='<div class="msg er">❌ Could not read this file. Please upload a valid image.</div>'};
+ img.src=URL.createObjectURL(file)};
+function check(img){const c=document.createElement("canvas"),s=Math.min(1,256/Math.max(img.width,img.height));
+ c.width=img.width*s;c.height=img.height*s;const x=c.getContext("2d");x.drawImage(img,0,0,c.width,c.height);
+ const d=x.getImageData(0,0,c.width,c.height).data,w=c.width,h=c.height,g=new Float32Array(w*h);let m=0;
+ for(let i=0;i<w*h;i++){g[i]=.299*d[i*4]+.587*d[i*4+1]+.114*d[i*4+2];m+=g[i]}m/=w*h;
+ let sum=0,sq=0,n=0;for(let y=1;y<h-1;y++)for(let X=1;X<w-1;X++){const i=y*w+X,l=g[i-1]+g[i+1]+g[i-w]+g[i+w]-4*g[i];sum+=l;sq+=l*l;n++}
+ const v=sq/n-(sum/n)**2,W=[];if(v<60)W.push("Image looks blurry.");if(m<40)W.push("Image is too dark.");if(m>220)W.push("Image is overexposed.");
+ $("q").innerHTML=W.map(t=>`<div class="msg wa">⚠️ ${t} Results may be unreliable.</div>`).join("")||'<div class="msg ok">✅ Image quality check passed (OpenCV-style blur & brightness test)</div>'}
+const BC={"Blue bin":"#2f6fd1","Green bin":"#2e8b57","Red / special":"#c0392b"};
+function binsHTML(c){const a=c==="Organic"?1:c==="E-waste"?2:0;return `<div class="bins">${[["Dry","#2f6fd1","♻️"],["Wet","#2e8b57","🌱"],["E-waste","#c0392b","⚠️"]].map((b,i)=>`<div class="bin ${i===a?"on":""}"><div class="lid" style="background:${b[1]}"></div><div class="bd" style="background:${b[1]}">${b[2]}</div>${b[0]}</div>`).join("")}</div><div class="note" style="text-align:center">Smart-bin simulation: the matching lid opens</div>`}
+function speak(t){try{speechSynthesis.cancel();speechSynthesis.speak(new SpeechSynthesisUtterance(t))}catch(e){}}
+$("go").onclick=()=>{const s=$("sim").value,t=+$("th").value,r=$("res");r.classList.remove("hide");
+ if($("mode").value==="m")return multi(t,r);
+ const conf=s==="Unknown"?.14:{Plastic:.87,Paper:.78,Metal:.82,Glass:.74,Organic:.91,"E-waste":.69}[s];
+ if(conf*100<t){r.innerHTML=`<div class="big">🤔 Could not classify reliably</div><div class="msg er">Confidence (${Math.round(conf*100)}%) is below your ${t}% threshold. Try a clearer, well-lit photo of a single item on a plain background.</div>`;return}
+ const [ic,st,tip]=D[s],bin=BIN[$("reg").value][s];
+ r.innerHTML=`<div class="big">${ic} Predicted category: ${s}</div>
+ <div class="row"><span>Confidence</span><b>${(conf*100).toFixed(1)}%</b></div><div class="bar"><i id="b"></i></div>
+ ${conf<.5?'<div class="msg wa">Moderate confidence – please double-check the item.</div>':''}
+ <div class="msg ok"><b>Status:</b> ${st}</div><div class="msg ok"><b>How to dispose:</b> ${tip}</div>
+ <div class="msg ok">🗑️ <span class="pill" style="background:${bin[1]}">${bin[0]}</span>${bin[2]}</div>${binsHTML(s)}
+ <button class="sec" id="spk">🔊 Read aloud</button><div class="note">+10 eco points earned!</div>`;
+ $("spk").onclick=()=>speak(`${s}. ${st.replace(/[^\w\s–-]/g,"")}. ${tip}`);
+ log(s,conf);setTimeout(()=>$("b").style.width=conf*100+"%",30);r.scrollIntoView({behavior:"smooth"})};
+function multi(t,r){const n=3+Math.floor(Math.random()*2),ks=[...CATS].sort(()=>Math.random()-.5).slice(0,n),W=cur.width,Hh=cur.height,cs=[[0,0],[1,0],[0,1],[1,1]].sort(()=>Math.random()-.5);
+ const items=ks.map((c,i)=>({c,cf:.55+Math.random()*.4,x:cs[i][0]*W/2+W*.04,y:cs[i][1]*Hh/2+Hh*.04,w:W*.42,h:Hh*.42}));
+ r.innerHTML=`<div class="big">🔎 ${n} items detected</div><canvas id="ov"></canvas><div id="il"></div><div class="note">Simulated detection: boxes are placed illustratively. A real version would use YOLO / SSD object detection.</div>`;
+ const cv=$("ov");cv.width=W;cv.height=Hh;const x=cv.getContext("2d");x.drawImage(cur,0,0);x.lineWidth=Math.max(3,W/150);x.font=`bold ${Math.max(14,W/28)}px sans-serif`;
+ let il="";items.forEach(o=>{const ok=o.cf*100>=t,col=ok?BC[BIN[$("reg").value][o.c][0]]||"#888":"#888";x.strokeStyle=col;x.strokeRect(o.x,o.y,o.w,o.h);x.fillStyle=col;const lb=`${o.c} ${(o.cf*100).toFixed(0)}%`;x.fillRect(o.x,o.y-parseInt(x.font.match(/\d+/)[0])-8,x.measureText(lb).width+10,parseInt(x.font.match(/\d+/)[0])+8);x.fillStyle="#fff";x.fillText(lb,o.x+5,o.y-6);
+  const b=BIN[$("reg").value][o.c];il+=ok?`<div class="msg ok">${D[o.c][0]} <b>${o.c}</b> (${(o.cf*100).toFixed(0)}%) → <span class="pill" style="background:${b[1]}">${b[0]}</span></div>`:`<div class="msg wa">❓ Uncertain item (${(o.cf*100).toFixed(0)}%) – retake photo</div>`;if(ok)log(o.c,o.cf)});
+ $("il").innerHTML=il;r.scrollIntoView({behavior:"smooth"})}
+
+let cur=null;
+const BIN={in:{Plastic:["Blue bin","#2f6fd1","Dry waste – clean & dry"],Paper:["Blue bin","#2f6fd1","Dry waste – keep it dry"],Metal:["Blue bin","#2f6fd1","Dry waste – rinse first"],Glass:["Blue bin","#2f6fd1","Dry waste – wrap broken pieces"],Organic:["Green bin","#2e8b57","Wet waste – compost if possible"],"E-waste":["Red / special","#c0392b","Hazardous – use e-waste centre"]},
+gen:{Plastic:["Recycling","#2f6fd1","Rinse and sort"],Paper:["Recycling","#2f6fd1","Keep dry"],Metal:["Recycling","#2f6fd1","Rinse first"],Glass:["Glass bank","#16a085","Return or bottle bank"],Organic:["Compost","#2e8b57","Food & garden waste"],"E-waste":["Drop-off","#c0392b","Take to collection point"]}};
+const CATS=Object.keys(D);let H=[];
+try{H=JSON.parse(localStorage.getItem("ecv")||"[]")}catch(e){}
+function save(){try{localStorage.setItem("ecv",JSON.stringify(H))}catch(e){}}
+function log(c,cf){H.unshift({c,cf,t:new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})});H=H.slice(0,200);save();dash()}
+function dash(){const n=H.length,cnt={};CATS.forEach(c=>cnt[c]=0);H.forEach(h=>cnt[h.c]++);
+ $("s1").textContent=n;$("s2").textContent=n?Math.round(100*(n-cnt.Organic-cnt["E-waste"])/n)+"%":"0%";$("s3").textContent=n*10;
+ const mx=Math.max(1,...Object.values(cnt));
+ $("bars").innerHTML=CATS.map(c=>`<div class="hb"><span>${D[c][0]} ${c}</span><div class="bar"><i style="width:${100*cnt[c]/mx}%"></i></div><b>${cnt[c]}</b></div>`).join("");
+ $("bdg").innerHTML=[[1,"🌱 Eco Starter"],[10,"♻️ Segregator"],[25,"🦸 Eco Hero"],[50,"🌍 Planet Guardian"]].map(b=>`<span class="badge ${n>=b[0]?"":"off"}">${b[1]} · ${b[0]}+</span>`).join("");
+ $("hist").innerHTML=n?H.slice(0,8).map(h=>`${D[h.c][0]} ${h.c} · ${(h.cf*100).toFixed(0)}% · ${h.t}`).join("<br>"):"No items yet – classify something first."}
+$("clr").onclick=()=>{H=[];save();dash()};
+document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tabs button").forEach(x=>x.classList.toggle("on",x===b));
+ ["cl","db"].forEach(t=>$(t).classList.toggle("hide",t!==b.dataset.t));if(b.dataset.t==="db")dash()});
+dash();
+</script></body></html>
